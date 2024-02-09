@@ -1,5 +1,7 @@
-﻿using EmployeeManagementSys.Filters.ActionFilters;
-using EmployeeManagementSys.Filters.ExceptionFilters;
+﻿﻿using System.Collections.Generic;
+using System.Security.Principal;
+using System.Threading.Tasks;
+using EmployeeManagementSys.Filters.ActionFilters;
 using EmployeeManagementSys.Models;
 using EmployeeManagementSys.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -8,54 +10,58 @@ namespace EmployeeManagementSys.Controllers;
 
 [ApiController]
 [Route("employee")]
-public class EmployeeController : Controller
+
+public abstract class EmployeeController : ControllerBase
 {
+    private readonly IEmployeeRepository _repo;
+
+    public EmployeeController(IEmployeeRepository repo)
+    {
+        _repo = repo;
+    }
 
     [HttpGet]
-    public IActionResult GetEmployees()
+    public ActionResult<IEnumerable<Employee>> GetEmployeesValues()
     {
-        return Ok(Test_EmployeeRepository.GetEmployees());
+        var employee = _repo.GetEmployees();
+        return Ok(employee);
     }
 
     [HttpGet("{id}")]
-    [Emp_IdValidationFilter]
-    public IActionResult GetEmployeeById(int id)
+    public ActionResult GetEmployeeById(int id)
     {
-
-        return Ok(Test_EmployeeRepository.GetEmployeeById(id));
+        return Ok(_repo.GetEmployeeById(id));
     }
 
     [HttpPost]
-    [Emp_DetailsValidationFilter]
-    public IActionResult AddEmployee([FromBody] Employee employee)
+    [Emp_IdValidationFilter]
+    public async Task<OkObjectResult> AddEmployee([FromBody] Employee employee)
     {
-        Test_EmployeeRepository.AddEmployee(employee);
 
-        return CreatedAtAction(nameof(GetEmployeeById),
-            new { id = employee.Id },
-            employee);
+        _repo.AddEmployee(employee);
+        return Ok(employee);
     }
 
-    [HttpPut("{id}")]
-    [Emp_IdValidationFilter]
-    [Emp_UpdateValidationFilter]
-    [Emp_HandleUpdateFilter]
-    public IActionResult UpdateEmployee(int id, Employee employee)
+    [HttpPut]
+    public async Task<ActionResult> UpdateEmployee(Employee employee)
     {
+        if (employee == null)
+        {
+            return NotFound("Getting null for student");
+        }
 
-        Test_EmployeeRepository.UpdateEmployee(employee);
-
-
-        return Ok($"Employeed#:{id} has been updated ");
+        _repo.UpdateEmployee(employee);
+        return Ok("Value Updated");
     }
 
     [HttpDelete("{id}")]
-    [Emp_IdValidationFilter]
-    public IActionResult DeleteEmployee(int id)
+    public async Task<ActionResult> DeleteEmployee(int id)
     {
-        var employee = Test_EmployeeRepository.GetEmployeeById(id);
-        Test_EmployeeRepository.DeleteEmployee(id);
-
-        return Ok($"Deleted #:{id} ");
+        if (id == null)
+        {
+            return NotFound("Getting null for student id");
+        }
+        _repo.DeleteEmployee(id);
+        return Ok("Value Deleted");
     }
 }

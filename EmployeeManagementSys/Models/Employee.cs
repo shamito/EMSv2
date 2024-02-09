@@ -1,19 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using EmployeeManagementSys.Repositories;
+using System.ComponentModel.DataAnnotations;
 
 namespace EmployeeManagementSys.Models
 {
-    public class Employee
+    public class Employee 
     {
         public int Id { get; set; }
-
-        [Required] 
+        [Required]
         public string FirstName { get; set; }
 
-        [Required] 
+        [Required]
         public string MiddleName { get; set; }
 
-        [Required] 
+        [Required]
         public string LastName { get; set; }
-        public object Employees { get; internal set; }
     }
 }
