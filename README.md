@@ -1,3 +1,3 @@
 EmployeeManagementSystem
-- With Static Data
-- Using InMemoryDatabase @ EmployeeRepository File
+- 100% Working CRUD
+- SQL Server Used as Database
